@@ -1,0 +1,10 @@
+corr_matrix_tag: 'polynomial'
+inv_corr_matrix_sigma2: 0.001
+inv_obs_matrix_sigma2: 0.001
+
+inv_corr_matrix_path: '/path/to/vae-mda-data/static/polynomial_corr_100km.npy'
+lat_path: '/path/to/vae-mda-data/static/latitudes.npy'
+lon_path: '/path/to/vae-mda-data/static/longitudes.npy'
+mask_path: '/path/to/vae-mda-data/static/land_mask.npy'
+limit: 100
+load_inv_corr_matrix: False

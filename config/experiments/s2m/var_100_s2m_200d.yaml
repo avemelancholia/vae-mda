@@ -1,0 +1,12 @@
+project_name: 'paper_s2m_200d'
+task_name: 'var_100_s2m_200d'
+
+data_config: 'config/data/sral/var_1f_sral_200d.yaml'
+batch_size: 1
+
+model_name: '3d_var_baseline'
+model_config: 'config/models/var/polynomial_100_s2m.yaml'
+steps: 20
+
+save_out: False
+device: 'cuda'

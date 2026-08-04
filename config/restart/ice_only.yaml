@@ -1,0 +1,31 @@
+# Satellite assimilation integrated with the NEMO pipeline using new optimizer (NoQC variant).
+project_name: 'paper_forecast_assimilation'
+task_name: 'ice_only'
+
+restart_dir: '/path/to/vae-mda-outputs/forecast_cycle/ice_only'
+sral_dir: '/path/to/vae-mda-data/sral/'
+wrf_dir: ''  # Set to /path/to/vae-mda-data/wrf when WRF forcing is used
+domain: '/path/to/vae-mda-data/static/BARKA12_domain_cfg_v1.3.nc'
+
+date: '2023-01-02'
+assim_type: 'physical' # 'naively'
+
+data_config: 'config/data/sral/inference_vae_4f_um_multiscale_sobel_binary_noqc.yaml'
+
+model_name: 'vae_3d_var'
+vae_type: 'diffusers'
+model_config: 'config/models/vae/df_basic_4f_um_multiscale_sobel_binary.yaml'
+batch_size: 1
+
+steps: 300
+assim_optimizer: 'adam'
+assim_lr: 0.01
+assim_scheduler: 'cosine'
+assim_min_lr: 0.0001
+grad_clip_norm: 1.0
+
+lat_weight: 0.01
+mod_weight: 0.1
+obs_weight: 6.0
+
+device: 'cuda'

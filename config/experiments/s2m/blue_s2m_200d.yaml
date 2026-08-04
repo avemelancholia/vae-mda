@@ -1,0 +1,11 @@
+project_name: 'paper_s2m_200d'
+task_name: 'blue_s2m_200d'
+
+data_config: 'config/data/sral/var_1f_sral_200d.yaml'
+batch_size: 1
+
+model_name: 'blue_baseline'
+model_config: 'config/models/blue/s2m.yaml'
+
+save_out: False
+device: 'cuda'

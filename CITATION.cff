@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use VAE-MDA, please cite the associated paper and this software."
+title: "VAE-MDA: Variational Multivariate Data Assimilation for Sea Ice"
+type: software
+version: 1.0.0
+date-released: 2026-07-31
+license: BSD-3-Clause
+authors:
+  - family-names: Ivanov
+    given-names: Vasily
+  - family-names: Antiufrieva
+    given-names: Liubov
+  - family-names: Burnaev
+    given-names: Evgeny
+  - family-names: Vanovskiy
+    given-names: Vladimir
+abstract: >-
+  Code for VAE training, latent-space multivariate data assimilation,
+  classical 3D-VAR, BLUE and EnKF baselines, and NEMO/SI3 restart transfer
+  used in Variational multivariate data assimilation improves sea-ice
+  analysis and forecasting.
+preferred-citation:
+  type: article
+  title: "Variational multivariate data assimilation improves sea-ice analysis and forecasting"
+  authors:
+    - family-names: Ivanov
+      given-names: Vasily
+    - family-names: Antiufrieva
+      given-names: Liubov
+    - family-names: Burnaev
+      given-names: Evgeny
+    - family-names: Vanovskiy
+      given-names: Vladimir

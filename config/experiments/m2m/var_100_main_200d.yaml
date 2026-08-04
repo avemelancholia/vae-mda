@@ -1,0 +1,11 @@
+project_name: 'm2m_main_200d'
+task_name: 'var_100_main_200d'
+data_config: 'config/data/model/var_200d.yaml'
+batch_size: 1
+
+model_name: '3d_var_baseline'
+model_config: 'config/models/var/polynomial_100.yaml'
+steps: 20
+
+save_out: False
+device: 'cuda'

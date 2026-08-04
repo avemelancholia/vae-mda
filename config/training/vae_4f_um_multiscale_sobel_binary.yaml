@@ -1,0 +1,22 @@
+project_name: '2015-2024_data'
+task_name: 'vae_4f_um_multiscale_sobel_binary'
+data_config: 'config/data/model/vae_4f_1y.yaml'
+
+model_name: 'diffusers'
+model_config: 'config/models/vae/df_basic_4f_um_multiscale_sobel_binary.yaml'
+pretrain: False
+
+loss_type: 'multiscale_siconc_aux'
+masked_loss: False
+optimizer: 'lion'
+lr: 0.0001
+batch_size: 8
+epoch: 30
+kl_weight: 0.01
+
+siconc_channel: 0
+ms_weight: 0.1
+ms_scales: [1, 2, 4]
+ms_scale_weights: [1.0, 0.5, 0.25]
+sobel_weight: 0.4
+binary_weight: 0.4

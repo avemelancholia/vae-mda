@@ -1,0 +1,18 @@
+project_name: '2015-2024_data'
+task_name: 'vae_training_1'
+data_config: 'config/data/model/vae_1f_1y.yaml'
+
+model_name: 'diffusers'
+model_config: 'config/models/vae/df_basic_1f.yaml'
+pretrain: False
+
+
+# training config
+loss_type: 'simple'
+masked_loss: True
+optimizer: 'lion'
+lr: 0.0001
+batch_size: 8
+epoch: 150
+kl_weight: 0.01
+log_dir: '/weights/'

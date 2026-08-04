@@ -1,0 +1,10 @@
+project_name: 'm2m_main_200d'
+task_name: 'enkf_correlated_main_200d'
+data_config: 'config/data/model/var_200d.yaml'
+batch_size: 1
+
+model_name: 'enkf_baseline'
+model_config: 'config/models/enkf/correlated_100km.yaml'
+
+save_out: False
+device: 'cuda'

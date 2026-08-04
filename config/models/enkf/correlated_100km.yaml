@@ -1,0 +1,17 @@
+# EnKF with spatially correlated ensemble perturbations matched to the
+# 100-km localization scale used by the BLUE/3D-VAR background covariance.
+# perturbation_radius is in grid cells: 25 cells x 3-4 km = 75-100 km.
+ensemble_size: 40
+background_std: 0.05
+obs_std: 0.05
+inflation: 1.0
+seed: 42
+clip_min: 0.0
+clip_max: 1.0
+localization: 'polynomial'
+lat_path: '/path/to/vae-mda-data/static/latitudes.npy'
+lon_path: '/path/to/vae-mda-data/static/longitudes.npy'
+mask_path: '/path/to/vae-mda-data/static/land_mask.npy'
+limit: 100
+perturbations: 'correlated'
+perturbation_radius: 25

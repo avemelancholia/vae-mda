@@ -1,0 +1,6 @@
+inv_corr_matrix_path: '/path/to/vae-mda-data/static/polynomial_corr_100km.npy'
+inv_corr_matrix_sigma2: 0.001
+obs_std: 0.02
+regularization: 1.0e-6
+clip_min: 0.0
+clip_max: 1.0

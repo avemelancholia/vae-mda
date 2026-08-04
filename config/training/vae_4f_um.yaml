@@ -1,0 +1,16 @@
+project_name: '2015-2024_data'
+task_name: 'vae_4f_um'
+data_config: 'config/data/model/vae_4f_1y.yaml'
+
+model_name: 'diffusers'
+model_config: 'config/models/vae/df_basic_4f_um.yaml'
+pretrain: False
+
+# training config
+loss_type: 'simple'
+masked_loss: False
+optimizer: 'lion'
+lr: 0.0001
+batch_size: 8
+epoch: 150
+kl_weight: 0.01

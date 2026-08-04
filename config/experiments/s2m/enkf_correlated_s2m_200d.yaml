@@ -1,0 +1,11 @@
+project_name: 'paper_s2m_200d'
+task_name: 'enkf_correlated_s2m_200d'
+
+data_config: 'config/data/sral/var_1f_sral_200d.yaml'
+batch_size: 1
+
+model_name: 'enkf_baseline'
+model_config: 'config/models/enkf/correlated_100km_s2m.yaml'
+
+save_out: False
+device: 'cuda'

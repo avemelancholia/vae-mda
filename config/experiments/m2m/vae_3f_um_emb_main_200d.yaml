@@ -1,0 +1,22 @@
+project_name: 'm2m_main_200d'
+task_name: 'vae_3f_um_emb_main_200d'
+data_config: 'config/data/model/vae_3f_200d.yaml'
+
+model_name: 'vae_3d_var'
+vae_type: 'diffusers'
+model_config: 'config/models/vae/df_basic_3f_um_emb.yaml'
+batch_size: 1
+steps: 300
+assim_optimizer: 'adam'
+assim_lr: 0.01
+assim_scheduler: 'cosine'
+assim_min_lr: 0.0001
+grad_clip_norm: 1.0
+restore_best_validation_step: false
+
+lat_weight: 0.1
+mod_weight: 0.1
+obs_weight: 1.0
+
+save_out: False
+device: 'cuda'

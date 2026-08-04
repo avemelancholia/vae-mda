@@ -1,0 +1,22 @@
+project_name: 'paper_s2m_200d'
+task_name: 'vae_4f_um_sobel_binary_s2m_200d'
+data_config: 'config/data/sral/vae_4f_sral_200d.yaml'
+
+model_name: 'vae_3d_var'
+vae_type: 'diffusers'
+model_config: 'config/models/vae/df_basic_4f_um_sobel_binary_01.yaml'
+batch_size: 1
+steps: 300
+assim_optimizer: 'adam'
+assim_lr: 0.01
+assim_scheduler: 'cosine'
+assim_min_lr: 0.0001
+grad_clip_norm: 1.0
+restore_best_validation_step: false
+
+lat_weight: 0.01
+mod_weight: 0.1
+obs_weight: 6.0
+
+save_out: False
+device: 'cuda'

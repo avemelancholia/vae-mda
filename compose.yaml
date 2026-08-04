@@ -1,0 +1,17 @@
+services:
+  vae-mda:
+    build: .
+    image: vae-mda:paper
+    env_file:
+      - .env
+    volumes:
+      - ${SCIML_ROOT:-/mnt/sciml}:/mnt/sciml
+      - ${NESTP_ROOT:-/mnt/nestp}:/mnt/nestp:ro
+    shm_size: 16gb
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

@@ -1,0 +1,37 @@
+# model config
+#linear: None
+vae_config:
+  _class_name: "AutoencoderKL"
+  _name_or_path: "df_basic_1f"
+  in_channels: 1
+  latent_channels: 1
+  out_channels: 1
+  act_fn: "silu"
+  block_out_channels: [
+    128,
+    256,
+    512,
+    512
+  ]
+  down_block_types: [
+    "DownEncoderBlock2D",
+    "DownEncoderBlock2D",
+    "DownEncoderBlock2D",
+    "DownEncoderBlock2D"
+  ]
+  mid_block_add_attention: True
+  force_upcast: True
+
+  layers_per_block: 2
+  norm_num_groups: 32
+  sample_size: 512
+  scaling_factor: 0.18215
+  up_block_types: [
+    "UpDecoderBlock2D",
+    "UpDecoderBlock2D",
+    "UpDecoderBlock2D",
+    "UpDecoderBlock2D"
+  ]
+
+linear: 512
+path: "/path/to/vae-mda-weights/vae_training_1_512"

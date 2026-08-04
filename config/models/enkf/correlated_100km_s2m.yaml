@@ -1,0 +1,16 @@
+# S2M variant of correlated_100km.yaml: obs_std scaled by 1/sqrt(6) to match
+# the stronger observation influence used in the satellite-to-model comparison.
+ensemble_size: 40
+background_std: 0.05
+obs_std: 0.0204124145
+inflation: 1.0
+seed: 42
+clip_min: 0.0
+clip_max: 1.0
+localization: 'polynomial'
+lat_path: '/path/to/vae-mda-data/static/latitudes.npy'
+lon_path: '/path/to/vae-mda-data/static/longitudes.npy'
+mask_path: '/path/to/vae-mda-data/static/land_mask.npy'
+limit: 100
+perturbations: 'correlated'
+perturbation_radius: 25

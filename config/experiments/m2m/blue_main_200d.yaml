@@ -1,0 +1,10 @@
+project_name: 'm2m_main_200d'
+task_name: 'blue_main_200d'
+data_config: 'config/data/model/var_200d.yaml'
+batch_size: 1
+
+model_name: 'blue_baseline'
+model_config: 'config/models/blue/basic.yaml'
+
+save_out: False
+device: 'cuda'

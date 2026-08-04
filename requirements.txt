@@ -1,0 +1,21 @@
+numpy==2.1.0
+pandas==2.2.3
+torch==2.6.0
+torchvision==0.21.0
+accelerate==1.4.0
+diffusers==0.32.2
+huggingface_hub==0.29.1
+lion-pytorch==0.2.3
+pendulum==3.0.0
+PyYAML==6.0.2
+matplotlib==3.10.1
+netCDF4==1.7.2
+xarray==2025.1.2
+scipy==1.15.2
+scikit-learn==1.6.1
+tqdm==4.67.1
+
+# Optional: online experiment logging with ClearML, auto-discovered from .env
+# (see README). Not installed by default; enable with:
+#   python -m pip install clearml==1.13.1
+# Without it, runs log locally to outputs/.
