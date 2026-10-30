@@ -14,9 +14,10 @@ assim_min_lr: 0.0001
 grad_clip_norm: 1.0
 restore_best_validation_step: false
 
-lat_weight: 0.01
-mod_weight: 0.1
+lat_weight: 0.1
+mod_weight: 0.0001
 obs_weight: 1.0
-
+# M2M-selected loss weights (Supplementary Table S4); the VAE is a fixed prior.
+freeze_vae: true
 save_out: False
 device: 'cuda'

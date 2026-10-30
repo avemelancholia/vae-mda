@@ -12,6 +12,7 @@ from .utils.restart import (
     assimilate_restarts_physical_ocean_bounded,
     assimilate_restarts_naively,
 )
+from .utils.restart_inputs import restart_inputs
 
 
 class AssimilationHandler:
@@ -222,6 +223,9 @@ class AssimilationHandler:
         
         params = self.model_class.init_params(self.model_config, self.config)
         model = self.model_class(**params)
+        if self.config.get('freeze_vae', False):
+            # Fixed prior: evaluation mode and frozen weights; only the latent variable is optimized.
+            model.model.eval().requires_grad_(False)
 
         for tensors, val_1, val_2, meta in self.dataloader:
             print(f'Date {meta["date"]} is in work.')
@@ -300,6 +304,9 @@ class InferenceHandler:
         
         params = self.model_class.init_params(self.model_config, self.config)
         model = self.model_class(**params)
+        if self.config.get('freeze_vae', False):
+            # Fixed prior: evaluation mode and frozen weights; only the latent variable is optimized.
+            model.model.eval().requires_grad_(False)
 
         for tensors, meta in self.dataloader:
             print(f'Date {meta["date"]} is in work.')
@@ -325,41 +332,35 @@ class InferenceHandler:
 
         restart_dir = Path(self.config['restart_dir'])/f"run_{self.config['date']}T00:00:00+00:00"/"nemo_restart"
         
+        if self.config['assim_type'] in ('physical', 'physical_ocean', 'physical_ocean_bounded'):
+            required_fields = ('siconc', 'sithic')
+            if self.config['assim_type'].startswith('physical_ocean'):
+                required_fields += ('sosstsst',)
+            # Fields the model does not decode (SIT and SST of a single-field model, SST of a
+            # three-field model) come unchanged from the branch background; they must be listed
+            # explicitly in restart_background_fields.
+            physical_fields, _ = restart_inputs(
+                x[0], self.data_config['back_field'], self.dataloader.dataset.background,
+                self.config.get('restart_background_fields', []), required_fields,
+            )
         if self.config['assim_type'] == 'physical':
-            assimilate_restarts_physical(restart_dir, x[0][0], x[0][1], self.config['domain'])
+            # ocean_restart may carry the new-ice energy options for the ice-only transfer
+            ice_options = self.config.get('ocean_restart', {})
+            assimilate_restarts_physical(
+                restart_dir, physical_fields['siconc'], physical_fields['sithic'], self.config['domain'],
+                **({'ice_energy_scheme': ice_options['ice_energy_scheme'],
+                    'new_ice_temperature_k': ice_options.get('new_ice_temperature_k', 270.0)}
+                   if ice_options.get('ice_energy_scheme', 'legacy') != 'legacy' else {}),
+            )
         elif self.config['assim_type'] == 'physical_ocean':
-            back_fields = list(self.data_config.get("back_field", []))
-            required_fields = ("siconc", "sithic", "sosstsst")
-            missing_fields = [field for field in required_fields if field not in back_fields]
-            if missing_fields:
-                raise KeyError(
-                    "assim_type='physical_ocean' requires fields "
-                    f"{required_fields}; missing {missing_fields} in data_config['back_field']"
-                )
             assimilate_restarts_physical_ocean(
-                restart_dir,
-                x[0][back_fields.index("siconc")],
-                x[0][back_fields.index("sithic")],
-                x[0][back_fields.index("sosstsst")],
-                self.config['domain'],
-                ocean_config=self.config.get("ocean_restart", {}),
+                restart_dir, physical_fields['siconc'], physical_fields['sithic'], physical_fields['sosstsst'],
+                self.config['domain'], ocean_config=self.config.get("ocean_restart", {}),
             )
         elif self.config['assim_type'] == 'physical_ocean_bounded':
-            back_fields = list(self.data_config.get("back_field", []))
-            required_fields = ("siconc", "sithic", "sosstsst")
-            missing_fields = [field for field in required_fields if field not in back_fields]
-            if missing_fields:
-                raise KeyError(
-                    "assim_type='physical_ocean_bounded' requires fields "
-                    f"{required_fields}; missing {missing_fields} in data_config['back_field']"
-                )
             assimilate_restarts_physical_ocean_bounded(
-                restart_dir,
-                x[0][back_fields.index("siconc")],
-                x[0][back_fields.index("sithic")],
-                x[0][back_fields.index("sosstsst")],
-                self.config['domain'],
-                ocean_config=self.config.get("ocean_restart", {}),
+                restart_dir, physical_fields['siconc'], physical_fields['sithic'], physical_fields['sosstsst'],
+                self.config['domain'], ocean_config=self.config.get("ocean_restart", {}),
             )
         elif self.config['assim_type'] == 'naively':
             assimilate_restarts_naively(restart_dir, x[0][0], x[0][1], self.config['domain'])

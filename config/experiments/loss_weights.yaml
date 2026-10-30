@@ -1,0 +1,83 @@
+# Loss-weight selection on the 60 development dates (Supplementary Note on loss-weight selection).
+# For each model and experiment, every (w_b, w_z) pair below is fitted on these dates with the base config;
+# w_y stays at 1 (M2M) or 6 (S2M). M2M selects the highest mean skill over the fields a model decodes,
+# against the following-year NEMO field; S2M selects the highest combined skill (dense AMSR2 and sparse
+# SRAL-conditioned AMSR2). Run with scripts/select_loss_weights.py.
+# Ten dates per month, January-June 2022 (Supplementary Table S5).
+dates: ['2022-01-01', '2022-01-04', '2022-01-08', '2022-01-11', '2022-01-14', '2022-01-18', '2022-01-21', '2022-01-24',
+  '2022-01-28', '2022-01-31', '2022-02-01', '2022-02-04', '2022-02-07', '2022-02-10', '2022-02-13', '2022-02-16',
+  '2022-02-19', '2022-02-22', '2022-02-25', '2022-02-28', '2022-03-01', '2022-03-04', '2022-03-08', '2022-03-11',
+  '2022-03-14', '2022-03-18', '2022-03-21', '2022-03-24', '2022-03-28', '2022-03-31', '2022-04-01', '2022-04-04',
+  '2022-04-07', '2022-04-11', '2022-04-14', '2022-04-17', '2022-04-20', '2022-04-24', '2022-04-27', '2022-04-30',
+  '2022-05-01', '2022-05-04', '2022-05-08', '2022-05-11', '2022-05-14', '2022-05-18', '2022-05-21', '2022-05-24',
+  '2022-05-28', '2022-05-31', '2022-06-01', '2022-06-04', '2022-06-07', '2022-06-11', '2022-06-14', '2022-06-17',
+  '2022-06-20', '2022-06-24', '2022-06-27', '2022-06-30']
+models:
+  vae_1f_d512:
+    M2M: config/experiments/m2m/vae_1f_512_main_200d.yaml
+    S2M: config/experiments/s2m/vae_1f_512_s2m_200d.yaml
+  vae_3f_um_emb:
+    M2M: config/experiments/m2m/vae_3f_um_emb_main_200d.yaml
+    S2M: config/experiments/s2m/vae_3f_um_emb_s2m_200d.yaml
+  vae_4f_um:
+    M2M: config/experiments/m2m/vae_4f_um_main_200d.yaml
+    S2M: config/experiments/s2m/vae_4f_um_s2m_200d.yaml
+  vae_4f_um_multiscale_sobel_binary:
+    M2M: config/experiments/m2m/vae_4f_um_multiscale_sobel_binary_main_200d.yaml
+    S2M: config/experiments/s2m/vae_4f_um_multiscale_sobel_binary_s2m_200d.yaml
+  vae_1f:
+    M2M: config/experiments/m2m/vae_1f_main_200d.yaml
+    S2M: config/experiments/s2m/vae_1f_s2m_200d.yaml
+  vae_4f_um_sobel_binary:
+    M2M: config/experiments/m2m/vae_4f_um_sobel_binary_main_200d.yaml
+    S2M: config/experiments/s2m/vae_4f_um_sobel_binary_s2m_200d.yaml
+  vae_4f_um_multiscale:
+    M2M: config/experiments/m2m/vae_4f_um_multiscale_main_200d.yaml
+    S2M: config/experiments/s2m/vae_4f_um_multiscale_s2m_200d.yaml
+  vae_4f_um_multiscale_block:
+    M2M: config/experiments/m2m/vae_4f_um_multiscale_block_main_200d.yaml
+    S2M: config/experiments/s2m/vae_4f_um_multiscale_block_s2m_200d.yaml
+M2M:
+  background_weights: [0.0001, 0.001, 0.003, 0.01, 0.1, 1.0]
+  latent_weights: [0.001, 0.01, 0.1, 0.3, 1.0]
+  extra_pairs:
+    vae_1f_d512: [[0.003, 0.0001]]
+    vae_3f_um_emb: [[0.003, 0.0001]]
+    vae_4f_um: [[0.003, 0.0001]]
+    vae_4f_um_multiscale_sobel_binary: [[0.003, 0.0001]]
+    vae_1f: [[0.003, 0.0001]]
+    vae_4f_um_sobel_binary: [[0.003, 0.0001]]
+    vae_4f_um_multiscale: [[0.003, 0.0001]]
+    vae_4f_um_multiscale_block: [[0.003, 0.0001]]
+S2M:
+  background_weights: [0.001, 0.01, 0.1, 1.0]
+  latent_weights: [0.0001, 0.001, 0.01, 0.1]
+  extra_pairs:
+    vae_1f_d512: [[0.003, 0.001], [0.1, 1.0e-05], [0.1, 1.0e-06], [0.03, 0.0001], [0.3, 0.0001], [0.003, 0.0001]]
+    vae_3f_um_emb: [[0.0001, 0.1], [0.01, 0.3], [0.01, 1.0], [0.0001, 0.3]]
+    vae_4f_um: [[0.0001, 0.1], [0.03, 0.001], [0.3, 0.001], [0.1, 0.3], [0.0001, 0.3]]
+    vae_4f_um_multiscale_sobel_binary: [[0.003, 0.01], [0.01, 0.03], [0.0001, 0.1], [0.01, 0.3]]
+    vae_1f: [[0.0001, 0.001]]
+    vae_4f_um_sobel_binary: [[0.003, 0.1]]
+    vae_4f_um_multiscale: [[0.0001, 0.1]]
+    vae_4f_um_multiscale_block: []
+selected:
+  M2M:
+    vae_1f_d512: [0.003, 0.001]
+    vae_3f_um_emb: [0.0001, 0.1]
+    vae_4f_um: [0.0001, 0.1]
+    vae_4f_um_multiscale_sobel_binary: [0.001, 0.1]
+    vae_1f: [0.0001, 0.001]
+    vae_4f_um_sobel_binary: [0.0001, 0.1]
+    vae_4f_um_multiscale: [0.0001, 0.1]
+    vae_4f_um_multiscale_block: [0.0001, 0.3]
+  S2M:
+    vae_1f_d512: [0.3, 0.0001]
+    vae_3f_um_emb: [0.01, 0.1]
+    vae_4f_um: [0.1, 0.0001]
+    vae_4f_um_multiscale_sobel_binary: [0.01, 0.01]
+    vae_1f: [0.1, 0.01]
+    vae_4f_um_sobel_binary: [0.001, 0.0001]
+    vae_4f_um_multiscale: [0.01, 0.1]
+    vae_4f_um_multiscale_block: [0.01, 0.1]
+output_root: /path/to/vae-mda-outputs/loss_weights

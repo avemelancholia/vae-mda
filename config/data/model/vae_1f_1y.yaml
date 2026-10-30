@@ -1,0 +1,41 @@
+# Data information 
+
+dataset_name: 'Fields3DVARDS'
+transform_name: 'vae'
+
+assimilation_range: 3
+add_gauss: False
+
+
+ass_data: 'model'
+
+back_field: ['siconc']
+indxs: [0]
+means: [0.0]
+stds: [1.0]
+padding: [0.0]
+
+val_source: ['model', 'track_imitation']
+val_field: [['siconc'], ['siconc']]
+
+sral_indx: 1
+
+dataset_dir: '/path/to/vae-mda-data/nemo'
+sat_dir: '/path/to/vae-mda-data/satellite'
+sral_dir: '/path/to/vae-mda-data/sral'
+
+# for traing
+train_start_day: '2015-01-01'
+train_end_day: '2021-12-31'
+
+val_start_day: '2022-01-01'
+val_end_day: '2022-12-31'
+
+# for assimilation
+back_start_day: '2022-01-01'
+back_end_day: '2022-07-15'
+
+obs_start_day: '2023-01-01'
+obs_end_day: '2023-07-15'
+
+mask_path: '/path/to/vae-mda-data/static/land_mask.npy'

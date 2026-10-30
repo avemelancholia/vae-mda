@@ -12,6 +12,8 @@ from matplotlib import pyplot as plt
 from pathlib import Path
 import os
 
+from .si3_energy import new_ice_energy_density
+
 
 def extract_coords(pieces):
     out = {}
@@ -55,10 +57,8 @@ def check_coverage(mapping, coords_domain):
         x0, y0 = coords["ind_00"]
         x1, y1 = coords["ind_11"]
         domain[x0 : x1 + 1, y0 : y1 + 1] = 0
-    print(
-        1 - np.sum(domain) / area,
-        "coverage in percentage  (<100% is ok, because of the land)",
-    )
+    coverage_fraction = 1 - np.sum(domain) / area
+    print(f"Restart tile coverage of full grid (including land): {100 * coverage_fraction:.2f}%")
 
 
 def create_mapping(pieces, domain):
@@ -588,6 +588,11 @@ def assimilate_ocean_surface_restarts(
 ):
     ocean_config = {} if ocean_config is None else ocean_config
     bounded = bool(ocean_config.get("bounded", False))
+    # Keep volume-based selection and freezing safeguards unchanged when testing
+    # the heat/salt caps. Switching to physical_ocean changes those rules too.
+    apply_budget_limits = ocean_config.get("apply_budget_limits", True)
+    if type(apply_budget_limits) is not bool:
+        raise ValueError("apply_budget_limits must be a boolean")
     pieces_ocean_restart = _select_ocean_restart_pieces(restart_dir)
     strict = bool(ocean_config.get("strict", False))
     if len(pieces_ocean_restart) == 0:
@@ -722,7 +727,8 @@ def assimilate_ocean_surface_restarts(
             heat_safety_loss * rho_ice * latent_heat * np.maximum(-delta_v_i, 0.0)
             + min_warming
         ) / (rho0 * cp * effective_depth)
-        increment = np.minimum(np.maximum(increment, -cooling_limit), warming_limit)
+        if apply_budget_limits:
+            increment = np.minimum(np.maximum(increment, -cooling_limit), warming_limit)
 
         supercool_tolerance = float(ocean_config.get("supercool_tolerance", 0.05))
         freezing_lower_increment = freezing_temp - supercool_tolerance - surface_temp
@@ -800,10 +806,11 @@ def assimilate_ocean_surface_restarts(
                     * salinity_contrast
                     / (rho0 * effective_depth)
                 )
-                salinity_increment = np.minimum(
-                    np.maximum(salinity_increment, -salt_decrease_limit),
-                    salt_increase_limit,
-                )
+                if apply_budget_limits:
+                    salinity_increment = np.minimum(
+                        np.maximum(salinity_increment, -salt_decrease_limit),
+                        salt_increase_limit,
+                    )
                 bounded_limits.update({
                     "max_salt_increase_limit": float(np.nanmax(salt_increase_limit[active])),
                     "max_salt_decrease_limit": float(np.nanmax(salt_decrease_limit[active])),
@@ -828,6 +835,7 @@ def assimilate_ocean_surface_restarts(
         f"vars={temperature_vars}, active_cells={int(active.sum())}, "
         f"max_abs_temp_increment={float(np.nanmax(np.abs(increment))):.6g}, "
         f"bounded={bounded}, "
+        f"budget_limits_applied={bounded and apply_budget_limits}, "
         f"salinity_update={salinity_update}"
         f"{bound_message}"
     )
@@ -843,6 +851,7 @@ def assimilate_ocean_surface_restarts(
         "salinity_update": salinity_update,
         "max_abs_salt_increment": max_abs_salt_increment,
         "bounded": bounded,
+        "budget_limits_applied": bounded and apply_budget_limits,
         "bounded_limits": bounded_limits,
     }
 
@@ -876,7 +885,15 @@ def assimilate_restarts_physical_ocean_bounded(
     ocean_config=None,
 ):
     old_ice = _load_ice_restart_state(restart_dir, domain, keys=("a_i", "v_i"))
-    assimilate_restarts_physical(restart_dir, siconc, sithic, domain)
+    ice_scheme = (ocean_config or {}).get("ice_energy_scheme", "legacy")
+    ice_temperature_k = (ocean_config or {}).get("new_ice_temperature_k", 270.0)
+    if ice_scheme == "legacy":
+        assimilate_restarts_physical(restart_dir, siconc, sithic, domain)
+    else:
+        assimilate_restarts_physical(
+            restart_dir, siconc, sithic, domain,
+            ice_energy_scheme=ice_scheme, new_ice_temperature_k=ice_temperature_k,
+        )
     new_ice = _load_ice_restart_state(restart_dir, domain, keys=("v_i",))
 
     bounded_config = {} if ocean_config is None else dict(ocean_config)
@@ -985,7 +1002,12 @@ def assimilate_restarts_physical(
     siconc,
     sithic,
     domain,
+    ice_energy_scheme="legacy",
+    new_ice_temperature_k=270.0,
 ):
+
+    if ice_energy_scheme not in ("legacy", "si3_native"):
+        raise ValueError(f"Unknown ice energy scheme: {ice_energy_scheme}")
 
     with xr.open_dataset(domain) as ds:
         mask_land = ds.top_level.data[0] == 0
@@ -1118,14 +1140,23 @@ def assimilate_restarts_physical(
         vars_nemo_ice['v_i']==0,
         vars_nemo_assim['v_i']!=0
     ) # новый снег (вроде у нас такого нет, но вдруг)
-    vars_nemo_assim['e_i_l01'][mask] = (
-        vars_nemo_assim['v_i'][mask].copy()*rho_ice*c_i +
-        vars_nemo_assim['v_i'][mask].copy()*rho_ice*c_s*d_t
-    )/2
-    vars_nemo_assim['e_i_l02'][mask] = (
-        vars_nemo_assim['v_i'][mask].copy()*rho_ice*c_i +
-        vars_nemo_assim['v_i'][mask].copy()*rho_ice*c_s*d_t
-    )/2
+    if ice_energy_scheme == "si3_native":
+        # NEMO iceistate.F90:373-376, nn_icesal=2. The updater stores
+        # sv_i/v_i = s_ref*rho_ice/1000; this exceeds 4.5 g/kg, so the
+        # SI3 vertical salinity profile is constant. Two equal layers.
+        cold_content = new_ice_energy_density(
+            new_ice_temperature_k, s_ref * rho_ice / 1000.0)
+        for key in ('e_i_l01', 'e_i_l02'):
+            vars_nemo_assim[key][mask] = vars_nemo_assim['v_i'][mask] * cold_content / 2.0
+    else:
+        vars_nemo_assim['e_i_l01'][mask] = (
+            vars_nemo_assim['v_i'][mask].copy()*rho_ice*c_i +
+            vars_nemo_assim['v_i'][mask].copy()*rho_ice*c_s*d_t
+        )/2
+        vars_nemo_assim['e_i_l02'][mask] = (
+            vars_nemo_assim['v_i'][mask].copy()*rho_ice*c_i +
+            vars_nemo_assim['v_i'][mask].copy()*rho_ice*c_s*d_t
+        )/2
     
     # Применяем ближайшего соседа
     nemo_ice_array = np.stack([

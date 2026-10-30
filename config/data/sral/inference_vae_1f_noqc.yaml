@@ -1,0 +1,17 @@
+# Inference data for the 2023 forecast branches (SRAL-conditioned AMSR2, rule 11).
+dataset_name: Fields3DVARDS
+transform_name: vae
+assimilation_range: 3
+add_gauss: false
+ass_data: sral
+back_field: [siconc]
+indxs: [0]
+means: [0.0]
+stds: [1.0]
+padding: [0.0]
+sral_indx: 11
+val_source: [amsr2, sral]
+val_field:
+- [siconc]
+- [siconc]
+mask_path: /path/to/vae-mda-data/static/land_mask.npy

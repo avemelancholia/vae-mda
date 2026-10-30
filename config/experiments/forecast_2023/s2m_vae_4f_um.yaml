@@ -1,0 +1,66 @@
+# 2023 selected-configuration forecast branch s2m_vae_4f_um (ice-ocean restart transfer).
+# New-ice layer energies: SI3 expression at 270 K (ocean_restart.ice_energy_scheme: si3_native).
+restart_dir: /path/to/vae-mda-outputs/forecast_2023/s2m_vae_4f_um
+sral_dir: /path/to/vae-mda-data/sral/
+wrf_dir: ''
+domain: /path/to/vae-mda-data/static/BARKA12_domain_cfg_v1.3.nc
+date: '2023-01-01'
+assim_type: physical_ocean_bounded
+data_config: config/data/sral/inference_vae_4f_um_multiscale_sobel_binary_noqc.yaml
+model_name: vae_3d_var
+vae_type: diffusers
+model_config: config/models/vae/df_basic_4f_um.yaml
+batch_size: 1
+steps: 300
+assim_optimizer: adam
+assim_lr: 0.01
+assim_scheduler: cosine
+assim_min_lr: 0.0001
+grad_clip_norm: 1.0
+lat_weight: 0.0001
+mod_weight: 0.1
+obs_weight: 6.0
+ocean_restart:
+  strict: false
+  bounded: true
+  temperature_vars: [tn, tb]
+  salinity_vars: [sn, sb]
+  alpha: 1.0
+  max_cool: 8.0
+  max_warm: 4.0
+  ice_delta_threshold: 0.0025
+  ice_volume_delta_threshold: 0.001
+  smooth_passes: 6
+  update_levels: 20
+  vertical_taper: [1.0, 1.0, 1.0, 1.0, 0.95, 0.9, 0.8, 0.7, 0.6, 0.5, 0.42, 0.35,
+    0.28, 0.22, 0.17, 0.13, 0.1, 0.07, 0.04, 0.02]
+  ice_gain_buffer: -0.2
+  ice_loss_buffer: 1.0
+  supercool_tolerance: 0.05
+  temperature_min: -3.0
+  temperature_max: 35.0
+  reference_density: 1025.0
+  heat_capacity: 4000.0
+  ice_density: 900.0
+  latent_heat_fusion: 334000.0
+  effective_depth_m: 20.0
+  heat_safety_factor: 1.5
+  heat_safety_factor_loss: 1.5
+  min_cooling_j_m2: 20500000.0
+  min_warming_j_m2: 20500000.0
+  salinity_update: true
+  salinity_alpha: 1.0
+  max_salt_increase: 0.5
+  max_salt_decrease: 0.25
+  salinity_min: 0.0
+  salinity_max: 40.0
+  salt_safety_factor: 1.0
+  salt_safety_factor_loss: 1.0
+  seawater_salinity_ref: 34.0
+  ice_salinity_ref: 7.0
+  salt_min_increase_psu: 0.02
+  salt_min_decrease_psu: 0.02
+  ice_energy_scheme: si3_native
+  new_ice_temperature_k: 270.0
+device: cuda
+freeze_vae: true

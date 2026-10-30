@@ -2,9 +2,9 @@ __pycache__/
 *.py[cod]
 real_configs/
 .venv/
-outputs/
-data/
-weights/
+/outputs/
+/data/
+/weights/
 .env
 *.npy
 *.npz

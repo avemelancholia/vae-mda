@@ -1,0 +1,38 @@
+# Data information 
+dataset_name: 'Fields3DVARDS'
+transform_name: 'vae'
+assimilation_range: 3
+add_gauss: False
+
+
+ass_data: 'model'
+
+back_field: ['siconc', 'sithic', 'sitemp']
+indxs: [0, 1, 2]
+means: [0.5, 0.5, -3]
+stds: [0.5, 0.5, 0.5]
+padding: [0.0, 0.0, -1.0]
+
+sral_indx: 11  # rule-11 track cells (the outdated rule 1 was corrected in the revision)
+val_source: ['model', 'track_imitation']
+val_field: [['siconc', 'sithic', 'sitemp'], ['siconc']]
+
+dataset_dir: '/path/to/vae-mda-data/nemo'
+sat_dir: '/path/to/vae-mda-data/satellite'
+sral_dir: '/path/to/vae-mda-data/sral'
+
+# for traing
+train_start_day: '2015-01-01'
+train_end_day: '2021-12-31'
+
+val_start_day: '2022-01-01'
+val_end_day: '2022-12-31'
+
+# for assimilation
+back_start_day: '2022-01-01'
+back_end_day: '2022-07-19'
+
+obs_start_day: '2023-01-01'
+obs_end_day: '2023-07-19'
+
+mask_path: '/path/to/vae-mda-data/static/land_mask.npy'
